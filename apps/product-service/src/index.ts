@@ -7,6 +7,14 @@ app.use(cors({
   credentials: true
 }));
 
+app.get("/health", (req,res) => {
+  return res.status(200).json({
+    status: "ok",
+    uptime: process.uptime(),
+    timestamp: Date.now()
+  })
+})
+
 app.listen(8000, () => {
   console.log(`Product service is running...`);
 })
