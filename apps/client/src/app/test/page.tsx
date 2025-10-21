@@ -13,7 +13,16 @@ const TestPage = async () => {
 
   // console.log(data);
 
-  const res = await fetch("http://localhost:8001/test", {
+  // const res = await fetch("http://localhost:8001/test", {
+  //   headers: {
+  //     Authorization: `Bearer ${token}`
+  //   }
+  // });
+  // const data = await res.json();
+
+  // console.log(data);
+
+  const res = await fetch("http://localhost:8002/test", {
     headers: {
       Authorization: `Bearer ${token}`
     }
