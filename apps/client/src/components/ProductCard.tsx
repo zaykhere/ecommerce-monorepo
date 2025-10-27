@@ -1,7 +1,7 @@
 "use client";
 
 import useCartStore from "@/stores/cartStore";
-import { ProductType } from "@/types";
+import { ProductType } from "@repo/types";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,8 +10,8 @@ import { toast } from "react-toastify";
 
 const ProductCard = ({product}: {product: ProductType}) => {
   const [productTypes, setProductTypes] = useState({
-    size: product.sizes[0],
-    color: product.colors[0],
+    size: product.sizes[0]!,
+    color: product.colors[0]!,
   });
 
   const {addToCart} = useCartStore();
@@ -20,8 +20,8 @@ const ProductCard = ({product}: {product: ProductType}) => {
     addToCart({
       ...product,
       quantity: 1,
-      selectedSize: productTypes.size,
-      selectedColor: productTypes.color
+      selectedSize: productTypes.size as string,
+      selectedColor: productTypes.color as string
     });
 
     toast.success("Product added to cart");
@@ -46,7 +46,7 @@ const ProductCard = ({product}: {product: ProductType}) => {
     <Link href={`/products/${product.id}`}>
       <div className="relative aspect-[2/3]">
         <Image
-          src={product.images?.[productTypes.color] || ""}
+          src={(product.images as Record<string, string>)?.[productTypes.color] || ""}
           alt={product.name}
           fill
           className="object-cover hover:scale-105 transition-all duration-300"
