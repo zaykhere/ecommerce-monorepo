@@ -16,7 +16,8 @@
     "@types/node": "^20",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
-    "@repo/types": "workspace:*"
+    "@repo/types": "workspace:*",
+    "@repo/kafka": "workspace:*"
   },
   "dependencies": {
     "@clerk/fastify": "^2.4.41",
