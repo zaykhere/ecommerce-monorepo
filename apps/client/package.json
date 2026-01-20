@@ -12,6 +12,9 @@
   "dependencies": {
     "@clerk/nextjs": "^6.33.7",
     "@hookform/resolvers": "^5.2.2",
+    "@repo/types": "workspace:*",
+    "@stripe/react-stripe-js": "^3.6.0",
+    "@stripe/stripe-js": "^7.0.0",
     "lucide-react": "^0.545.0",
     "next": "15.5.4",
     "react": "19.1.0",
@@ -19,8 +22,7 @@
     "react-hook-form": "^7.65.0",
     "react-toastify": "^11.0.5",
     "zod": "^4.1.12",
-    "zustand": "^5.0.8",
-    "@repo/types": "workspace:*"
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

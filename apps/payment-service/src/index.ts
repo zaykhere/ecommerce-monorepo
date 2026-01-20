@@ -3,10 +3,16 @@ import { Hono } from "hono";
 import { clerkMiddleware, getAuth } from '@hono/clerk-auth'
 import { shouldBeUser } from "./middleware/authMiddleware.js";
 import stripe from "./utils/stripe.js";
+import sessionRoute from "./routes/session.route.js";
+import webhookRoute from "./routes/webhooks.route.js";
+import { cors } from "hono/cors";
 
 const app = new Hono();
 
 app.use('*', clerkMiddleware())
+app.use("*", cors({
+  origin: ['http://localhost:3002']
+}));
 
 app.get("/health", (c) => {
   return c.json({
@@ -15,6 +21,9 @@ app.get("/health", (c) => {
     timestamp: Date.now()
   })
 });
+
+app.route("/sessions", sessionRoute);
+app.route("/webhooks", webhookRoute)
 
 // app.post("/create-stripe-product", async (c) => {
 //   const res = await stripe.products.create({
