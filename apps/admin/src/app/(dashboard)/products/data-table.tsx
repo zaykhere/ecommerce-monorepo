@@ -21,6 +21,10 @@ import {
 import { DataTablePagination } from "@/components/TablePagination";
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -48,37 +52,75 @@ export function DataTable<TData, TValue>({
     },
   });
 
+  const { getToken } = useAuth();
+  const router = useRouter();
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const token = await getToken();
+      const selectedRows = table.getSelectedRowModel().rows;
+
+      await Promise.all(
+        selectedRows.map(async (row) => {
+          const productId = (row.original as { id: string }).id;
+
+          await fetch(
+            `${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/products/${productId}`,
+            {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+        })
+      );
+    },
+    onSuccess: () => {
+      toast.success("Product(s) deleted successfully");
+      router.refresh();
+      table.resetRowSelection();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to delete products");
+    },
+  });
+
   return (
     <div className="rounded-md border">
       {Object.keys(rowSelection).length > 0 && (
         <div className="flex justify-end">
-          <button className="flex items-center gap-2 bg-red-500 text-white px-2 py-1 text-sm rounded-md m-4 cursor-pointer">
-            <Trash2 className="w-4 h-4"/>
-            Delete Product(s)
+          <button
+            className="flex items-center gap-2 bg-red-500 text-white px-2 py-1 text-sm rounded-md m-4 cursor-pointer disabled:opacity-50"
+            onClick={() => mutation.mutate()}
+            disabled={mutation.isPending}
+          >
+            <Trash2 className="w-4 h-4" />
+            {mutation.isPending ? "Deleting..." : "Delete Product(s)"}
           </button>
         </div>
       )}
+
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                );
-              })}
+              {headerGroup.headers.map((header) => (
+                <TableHead key={header.id}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                </TableHead>
+              ))}
             </TableRow>
           ))}
         </TableHeader>
+
         <TableBody>
-          {table.getRowModel().rows?.length ? (
+          {table.getRowModel().rows.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
@@ -86,7 +128,10 @@ export function DataTable<TData, TValue>({
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    {flexRender(
+                      cell.column.columnDef.cell,
+                      cell.getContext()
+                    )}
                   </TableCell>
                 ))}
               </TableRow>
@@ -100,6 +145,7 @@ export function DataTable<TData, TValue>({
           )}
         </TableBody>
       </Table>
+
       <DataTablePagination table={table} />
     </div>
   );

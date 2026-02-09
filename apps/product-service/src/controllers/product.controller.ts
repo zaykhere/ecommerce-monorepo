@@ -7,6 +7,9 @@ export const createProduct = async (req: Request, res: Response) => {
   const data: Prisma.ProductCreateInput = req.body;
 
   const { colors, images } = data;
+
+  console.log({colors, images})
+
   if (!colors || !Array.isArray(colors) || colors.length === 0) {
     return res.status(400).json({ message: "Colors array is required!" });
   }

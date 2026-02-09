@@ -8,6 +8,7 @@ const getData = async (): Promise<ProductsType> => {
       `${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/products`
     );
     const data = await res.json();
+    console.log(data);
     return data;
   } catch (error) {
     console.log(error);

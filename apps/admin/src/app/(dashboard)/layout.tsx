@@ -6,6 +6,8 @@ import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { cookies } from "next/headers";
+import QueryProvider from "@/components/providers/QueryProvider";
+import { ToastContainer } from "react-toastify";
 
 export const metadata: Metadata = {
   title: "Admin - Threadly",
@@ -17,12 +19,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
 
-  const cookieStore = await cookies()
-  const defaultOpen = cookieStore.get("sidebar_state")?.value === "true"
-  
   return (
-    <div className="flex">
+    <QueryProvider>
+      <div className="flex">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -38,5 +40,7 @@ export default async function RootLayout({
           </SidebarProvider>
         </ThemeProvider>
       </div>
+      <ToastContainer position="bottom-right" />
+    </QueryProvider>
   );
 }
