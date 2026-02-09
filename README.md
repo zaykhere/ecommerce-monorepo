@@ -1,135 +1,123 @@
-# Turborepo starter
+# Threadly
 
-This Turborepo starter is maintained by the Turborepo core team.
+**Threadly** is a scalable, event-driven e-commerce platform built with a modern microservices architecture and managed within a Turborepo monorepo. It leverages Apache Kafka for robust asynchronous communication between services, ensuring high performance and decoupling.
 
-## Using this example
+This project demonstrates advanced expertise in building distributed systems, utilizing industry-standard tools and practices for backend scalability and frontend excellence.
 
-Run the following command:
+## 🚀 Key Features
 
-```sh
-npx create-turbo@latest
+*   **Microservices Architecture**: Discrete services for Auth, Order, Product, Payment, and Email, allowing independent scaling and deployment.
+*   **Event-Driven Communication**: Powered by **Apache Kafka**, ensuring reliable data consistency and asynchronous processing across services.
+*   **Monorepo Strategy**: Managed with **Turborepo** and **PNPM Workspaces** for efficient build pipelines, shared code, and unified dependency management.
+*   **Modern Frontend**:
+    *   **Admin Dashboard**: Built with Next.js 15, React 19, Shadcn UI, and React Query for a premium management experience.
+    *   **Client Storefront**: A high-performance e-commerce storefront using Next.js 15, Zustand for state management, and Stripe for payments.
+*   **Type Safety**: End-to-end TypeScript support across all apps and shared packages.
+*   **Centralized Authentication**: Integrated with Clerk for secure and seamless user management.
+
+## 🏗 Architecture Overview
+
+Threadly follows a **Monorepo Microservices** pattern. Code is organized into `apps` (deployable services/applications) and `packages` (shared libraries).
+
+### Communication Flow
+Inter-service communication is primarily asynchronous, governed by an Event Bus pattern using Kafka.
+*   **Example**: When an order is placed in the `order-service`, an `OrderCreated` event is published to Kafka. The `payment-service`, `product-service` (inventory), and `email-service` consume this event to perform their respective tasks without direct coupling.
+
+### Project Structure
+
+```text
+├── apps
+│   ├── admin             # Next.js Admin Dashboard
+│   ├── client            # Next.js Customer Storefront
+│   ├── auth-service      # Express + Clerk Auth Service
+│   ├── order-service     # Fastify + MongoDB Order Management
+│   ├── product-service   # Express + MongoDB Product Catalog
+│   ├── payment-service   # Payment Processing Service
+│   └── email-service     # Notification Service
+├── packages
+│   ├── kafka             # Shared Kafka client wrappers (Producer/Consumer)
+│   ├── order-db          # Mongoose models & connection for Order DB
+│   ├── product-db        # Mongoose models & connection for Product DB
+│   ├── types             # Shared TypeScript definitions (DTOs, Events)
+│   ├── eslint-config     # Shared linting configuration
+│   └── typescript-config # Shared TS configuration
 ```
 
-## What's inside?
+## 🛠 Tech Stack
 
-This Turborepo includes the following packages/apps:
+### Core
+*   **Monorepo**: Turborepo, PNPM
+*   **Runtime**: Node.js
+*   **Languages**: TypeScript
 
-### Apps and Packages
+### Backend Infrastructure
+*   **Message Broker**: Apache Kafka (Zookeeper)
+*   **Databases**: MongoDB (Mongoose Application-Level access)
+*   **Microservices**: Express, Fastify
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+### Frontend
+*   **Framework**: Next.js 15 (App Router)
+*   **Styling**: TailwindCSS, Shadcn UI, Lucide React
+*   **State Management**: Zustand, React Query/TanStack Query
+*   **Forms**: React Hook Form, Zod
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+### DevOps & Tools
+*   **Containerization**: Docker (for Kafka/Zookeeper)
+*   **Linting/Formatting**: ESLint, Prettier
 
-### Utilities
+## 🏁 Getting Started
 
-This Turborepo has some additional tools already setup for you:
+Follow these instructions to set up the project locally.
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+### Prerequisites
+*   **Node.js** (v18 or higher)
+*   **PNPM** (`npm install -g pnpm`)
+*   **Docker Desktop** (Required for running Kafka)
 
-### Build
+### Installation
 
-To build all apps and packages, run the following command:
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/zaykhere/ecommerce-monorepo.git
+    cd ecommerce-monorepo
+    ```
 
-```
-cd my-turborepo
+2.  **Install dependencies**
+    ```bash
+    pnpm install
+    ```
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
+3.  **Start Infrastructure (Kafka)**
+    This project requires Kafka to be running for inter-service communication.
+    ```bash
+    cd packages/kafka
+    docker-compose up -d
+    ```
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
+4.  **Set up Environment Variables**
+    Create `.env` files in each service directory (`apps/*/`). Refer to `.env.example` in each directory for required keys (Database URLs, Clerk Keys, Stripe Keys, etc.).
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+5.  **Run the Applications**
+    From the root directory, you can start all services in development mode using Turbo:
+    ```bash
+    pnpm dev
+    ```
+    *   **Admin**: http://localhost:3003
+    *   **Client**: http://localhost:3002
+    *   **Services**: Various ports (check console output)
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+## 📦 Service Details
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+| Service | Port | Tech Stack | Description |
+| :--- | :--- | :--- | :--- |
+| **Admin** | 3003 | Next.js, React 19 | Back-office dashboard for managing products and orders. |
+| **Client** | 3002 | Next.js, React 19 | Customer-facing storefront. |
+| **Auth** | 8004 | Express, Clerk | Handles user authentication and identity events. |
+| **Order** | 8001 | Fastify, MongoDB | Manages order lifecycle and persistence. |
+| **Product** | 8003 | Express, MongoDB | Manages product catalog and inventory. |
+| **Payment** | 8002 | Hono | Processes payments and handles transaction events. |
+| **Email** | - | Node.js | Sends transactional emails based on system events. |
 
-### Develop
+---
 
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+*Built with ❤️ by Zain Javed*
